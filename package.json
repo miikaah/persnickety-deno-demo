@@ -15,8 +15,7 @@
       "npm run lint"
     ],
     "*.{js,jsxts,tsx,json,md}": [
-      "prettier --write",
-      "git add"
+      "prettier --write"
     ]
   },
   "husky": {
