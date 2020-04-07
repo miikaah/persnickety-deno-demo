@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "module": "esNext",
+    "removeComments": true,
+    "sourceMap": true
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ]
+}
