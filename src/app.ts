@@ -17,7 +17,7 @@ console.log(`Serving http://localhost:${PORT}/`);
 for await (const req of server) {
   const handler = await getRouteHandler(req);
   if (!handler) {
-    req.respond({ status: 404, body: 'Not Found' });
+    req.respond({ status: 404, body: "Not Found" });
     continue;
   }
   handler(req as Request);

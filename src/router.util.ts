@@ -7,7 +7,7 @@ export { ServerRequest } from "https://deno.land/std/http/server.ts";
 
 export type Params = {
   [x: string]: any; // eslint-disable-line
-}
+};
 
 export interface Request extends ServerRequest {
   pathParams: Params;
@@ -17,20 +17,20 @@ export interface Request extends ServerRequest {
 
 // const pipe = (...middlewares: Array<(req: ServerRequest) => void>) => {
 // };
-export type RequestHandler = (req: Request) => Promise<void>
+export type RequestHandler = (req: Request) => Promise<void>;
 
 export const routeHandlers = new Map<string, RequestHandler>();
 
 export function addGet(path: string, handler: RequestHandler): void {
-  routeHandlers.set(`GET${path}`, handler)
+  routeHandlers.set(`GET${path}`, handler);
 }
 
 export function addPost(path: string, handler: RequestHandler): void {
-  routeHandlers.set(`POST${path}`, handler)
+  routeHandlers.set(`POST${path}`, handler);
 }
 
 export function addPut(path: string, handler: RequestHandler): void {
-  routeHandlers.set(`PUT${path}`, handler)
+  routeHandlers.set(`PUT${path}`, handler);
 }
 
 interface Query {
@@ -38,12 +38,14 @@ interface Query {
 }
 
 const getQueryAsObject = (queryString: string): Query => {
-  const queryParts = queryString.split('&')
-  return queryParts.map(param => {
-    const paramParts = param.split('=')
-    return { [paramParts[0]]: paramParts[1] }
-  }).reduce((param, acc) => ({ ...acc, ...param }))
-}
+  const queryParts = queryString.split("&");
+  return queryParts
+    .map((param) => {
+      const paramParts = param.split("=");
+      return { [paramParts[0]]: paramParts[1] };
+    })
+    .reduce((param, acc) => ({ ...acc, ...param }));
+};
 
 interface UrlAndQuery {
   url: string;
@@ -51,30 +53,35 @@ interface UrlAndQuery {
 }
 
 export const stripQueryFromUrl = (url: string): UrlAndQuery => {
-  if (!url.includes('?')) {
+  if (!url.includes("?")) {
     return {
       url,
-      query: {}
-    }
+      query: {},
+    };
   }
-  const urlParts = url.split('?')
+  const urlParts = url.split("?");
   return {
     url: urlParts[0],
-    query: getQueryAsObject(urlParts[1])
-  }
-}
+    query: getQueryAsObject(urlParts[1]),
+  };
+};
 
-const parseBodyByContentType = (req: ServerRequest, payload: string): object | string => {
-  const contentType = req.headers.get('content-type');
-  if (contentType === 'application/json') {
+const parseBodyByContentType = (
+  req: ServerRequest,
+  payload: string
+): object | string => {
+  const contentType = req.headers.get("content-type");
+  if (contentType === "application/json") {
     return JSON.parse(payload);
   }
-  console.warn(`Content type "${contentType}" is not handled currently`)
+  console.warn(`Content type "${contentType}" is not handled currently`);
   return payload;
-}
+};
 
-export const getRequestBody = async (req: ServerRequest): Promise<object | string> => {
-  if (!req.contentLength) return '';
+export const getRequestBody = async (
+  req: ServerRequest
+): Promise<object | string> => {
+  if (!req.contentLength) return "";
 
   const buf = new Uint8Array(req.contentLength);
   let bufSlice = buf;
@@ -88,37 +95,47 @@ export const getRequestBody = async (req: ServerRequest): Promise<object | strin
     if (totRead >= req.contentLength) break;
     bufSlice = bufSlice.subarray(nread);
   }
-  const payload = decode(bufSlice)
+  const payload = decode(bufSlice);
   return parseBodyByContentType(req, payload);
-}
+};
 
 interface HandlerWithParams {
   routeKey: string | unknown;
   handlerWithParams: RequestHandler | undefined;
 }
 
-export const getHandlerWithParams = (url: string, method: string, urlParts: string[]): HandlerWithParams => {
-  const hasTrailingSlash = url.endsWith('/')
-  const urlLength = url.split('/').length - (hasTrailingSlash ? 1 : 0)
-  const urlRoot = `${method}/${urlParts[1]}`
-  const routes = Array.from(routeHandlers.keys())
-  const routeKey = routes.find((route: string) => route.startsWith(urlRoot) && route.split('/').length === urlLength)
-  const handlerWithParams = routeHandlers.get(routeKey || '')
-  return { routeKey, handlerWithParams }
-}
+export const getHandlerWithParams = (
+  url: string,
+  method: string,
+  urlParts: string[]
+): HandlerWithParams => {
+  const hasTrailingSlash = url.endsWith("/");
+  const urlLength = url.split("/").length - (hasTrailingSlash ? 1 : 0);
+  const urlRoot = `${method}/${urlParts[1]}`;
+  const routes = Array.from(routeHandlers.keys());
+  const routeKey = routes.find(
+    (route: string) =>
+      route.startsWith(urlRoot) && route.split("/").length === urlLength
+  );
+  const handlerWithParams = routeHandlers.get(routeKey || "");
+  return { routeKey, handlerWithParams };
+};
 
-export const getParams = (routeKey: string | unknown, urlParts: string[]): Params => {
+export const getParams = (
+  routeKey: string | unknown,
+  urlParts: string[]
+): Params => {
   const paramIndexes: number[] = [];
   const paramNames = (routeKey as string)
-    .split('/')
+    .split("/")
     .filter((part, index) => {
-      if (part.includes(':')) {
-        paramIndexes.push(index)
+      if (part.includes(":")) {
+        paramIndexes.push(index);
         return true;
       }
     })
-    .map(paramName => paramName.replace(':', ''))
+    .map((paramName) => paramName.replace(":", ""));
   return paramNames
     .map((name, index) => ({ [name]: urlParts[paramIndexes[index]] }))
-    .reduce((param, acc) => ({ ...acc, ...param }))
-}
+    .reduce((param, acc) => ({ ...acc, ...param }));
+};
