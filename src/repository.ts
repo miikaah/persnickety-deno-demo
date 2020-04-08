@@ -1,16 +1,11 @@
-// @ts-ignore
 import {
   writeJson,
   readFileStr,
   ensureFile,
+  // @ts-ignore
 } from "https://deno.land/std/fs/mod.ts";
 
 const FILE = "./foos.json";
-
-export const foos = new Map<string, string>([
-  ["a", "fooA"],
-  ["b", "fooB"],
-]);
 
 type Foo = {
   id: string;
