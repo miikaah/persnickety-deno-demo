@@ -12,8 +12,13 @@ PUT
 ```sh
 curl --header "Content-Type: application/json" \
   --request PUT \
-  --data '{"foo":"foz","bar":"baz"}' \
-  http://localhost:8000/foo/c
+  --data '{"id":"a","foo":"foz"}' \
+  http://localhost:8000/foo/a
+
+curl --header "Content-Type: application/json" \
+  --request PUT \
+  --data '{"id":"b","bar":"baz"}' \
+  http://localhost:8000/foo/b
 ```
 
 DELETE

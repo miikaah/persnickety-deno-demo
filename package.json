@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "denon --allow-net src/app.ts",
+    "start": "denon --allow-net --allow-read=. --allow-write=. src/app.ts",
     "lint": "eslint 'src/**/*.{js,ts}'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
