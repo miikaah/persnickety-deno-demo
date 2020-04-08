@@ -28,7 +28,7 @@ const readFoosFromFs = async (): Promise<Foo[]> => {
 
 export const addFoo = async (foo: Foo): Promise<void> => {
   const fsFoos = await readFoosFromFs();
-  return writeFoosToFs([...fsFoos, foo]);
+  return writeFoosToFs([...fsFoos.filter((f) => f.id !== foo.id), foo]);
 };
 
 export const getAllFoos = async (): Promise<Foo[]> => {
