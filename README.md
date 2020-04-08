@@ -1,3 +1,10 @@
+TODO
+
+- Handle route collision e.g. foo/:id and foo/foo simultaneously
+- Add middleware handling
+- Add beforeAll middleware
+- Add afterAll middleware
+
 POST
 
 ```sh
