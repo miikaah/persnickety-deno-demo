@@ -1,14 +1,11 @@
 {
   "compilerOptions": {
     "module": "esNext",
+    "lib": ["dom", "ESNext"],
+    "target": "es2018",
     "removeComments": true,
     "sourceMap": true
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "**/*.spec.ts"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
 }
