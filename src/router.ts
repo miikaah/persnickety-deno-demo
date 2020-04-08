@@ -16,9 +16,8 @@ export default async function getRouteHandler(
   const { url, query } = stripQueryFromUrl(req.url);
   const method = req.method;
   const handler = routeHandlers.get(`${method}${url}`);
-  (req as Request).queryParams = query;
 
-  // Read body
+  (req as Request).queryParams = query;
   (req as Request).payload = await getRequestBody(req);
 
   // No path params, we can return early

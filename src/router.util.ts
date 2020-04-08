@@ -33,6 +33,10 @@ export function addPut(path: string, handler: RequestHandler): void {
   routeHandlers.set(`PUT${path}`, handler);
 }
 
+export function addDelete(path: string, handler: RequestHandler): void {
+  routeHandlers.set(`DELETE${path}`, handler);
+}
+
 interface Query {
   [x: string]: string;
 }
