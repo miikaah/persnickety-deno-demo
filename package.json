@@ -6,7 +6,8 @@
   "scripts": {
     "start": "denon --allow-net src/app.ts",
     "lint": "eslint 'src/**/*.{js,ts}' --fix",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "pretty": "prettier --write ."
   },
   "author": "",
   "license": "ISC",
@@ -14,14 +15,13 @@
     "*.{js,jsx,ts,tsx}": [
       "npm run lint"
     ],
-    "*.{js,jsxts,tsx,json,md}": [
-      "prettier --write .",
-      "git add"
+    "*.{js,jsx,ts,tsx,json,md}": [
+      "prettier --write ."
     ]
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "npm run pretty"
     }
   },
   "devDependencies": {
