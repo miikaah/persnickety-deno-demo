@@ -8,6 +8,7 @@ import {
 const FILE = "./foos.json";
 
 type Foo = {
+  [key: string]: string;
   id: string;
   foo: string;
 };

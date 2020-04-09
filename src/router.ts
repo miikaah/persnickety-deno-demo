@@ -24,11 +24,7 @@ export default async function getRouteHandler(
   if (handler) return handler;
 
   const urlParts = url.split("/");
-  const { routeKey, handlerWithParams } = getHandlerWithParams(
-    url,
-    method,
-    urlParts
-  );
+  const { routeKey, handlerWithParams } = getHandlerWithParams(url, urlParts);
 
   if (!handlerWithParams) return;
 

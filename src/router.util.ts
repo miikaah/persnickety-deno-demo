@@ -110,17 +110,23 @@ interface HandlerWithParams {
 
 export const getHandlerWithParams = (
   url: string,
-  method: string,
   urlParts: string[]
 ): HandlerWithParams => {
   const hasTrailingSlash = url.endsWith("/");
-  const urlLength = url.split("/").length - (hasTrailingSlash ? 1 : 0);
-  const urlRoot = `${method}/${urlParts[1]}`;
+  const urlLength = urlParts.length - (hasTrailingSlash ? 1 : 0);
   const routes = Array.from(routeHandlers.keys());
-  const routeKey = routes.find(
-    (route: string) =>
-      route.startsWith(urlRoot) && route.split("/").length === urlLength
-  );
+  const routeKey = routes.find((route: string) => {
+    const routeParts = route.split("/");
+    return (
+      routeParts.length === urlLength &&
+      routeParts.every((routePart, index) => {
+        const urlPart = urlParts[index];
+        return (
+          urlPart === routePart || urlPart === "" || routePart.includes(":")
+        );
+      })
+    );
+  });
   const handlerWithParams = routeHandlers.get(routeKey || "");
   return { routeKey, handlerWithParams };
 };
