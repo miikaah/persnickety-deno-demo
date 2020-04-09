@@ -8,9 +8,10 @@ export default function initFooPut(): void {
     const id = req.pathParams.id;
     const foo = await getFoo(id);
 
-    if (!foo) return req.respond({ status: 404, body: "Not Found\n" });
+    if (!foo) return req.respondNotFound();
 
     await removeFoo(id);
-    return req.respond({ status: 200, body: "OK\n" });
+
+    req.respondOk();
   });
 }

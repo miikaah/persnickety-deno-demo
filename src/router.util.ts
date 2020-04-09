@@ -1,5 +1,8 @@
 // @ts-ignore
-import { ServerRequest } from "https://deno.land/std/http/server.ts";
+import {
+  ServerRequest,
+  Response as ServerResponse,
+} from "https://deno.land/std/http/server.ts";
 // @ts-ignore
 import { decode } from "https://deno.land/std/encoding/utf8.ts";
 // @ts-ignore
@@ -9,32 +12,46 @@ export type Params = {
   [x: string]: any; // eslint-disable-line
 };
 
+export interface Response extends ServerResponse {} // eslint-disable-line
+
 export interface Request extends ServerRequest {
   pathParams: Params;
   queryParams: Params;
   payload: any;
+  response: Response;
+  respond: (res: Response) => Promise<void>;
+  respondOk: (res?: Response) => void;
+  respondNotFound: (res?: Response) => void;
+  hasResponded: boolean;
 }
 
-// const pipe = (...middlewares: Array<(req: ServerRequest) => void>) => {
-// };
+const defaultResponder = async (req: Request): Promise<void> => {
+  if (req.hasResponded) return;
+  return req.respond(req.response || { status: 200, body: "OK" });
+};
+
 export type RequestHandler = (req: Request) => Promise<void>;
 
-export const routeHandlers = new Map<string, RequestHandler>();
+export const routeHandlers = new Map<string, RequestHandler[]>();
 
-export function addGet(path: string, handler: RequestHandler): void {
-  routeHandlers.set(`GET${path}`, handler);
+const getHandlers = (handlers: RequestHandler[]): RequestHandler[] => {
+  return [...handlers, defaultResponder];
+};
+
+export function addGet(path: string, ...handlers: RequestHandler[]): void {
+  routeHandlers.set(`GET${path}`, getHandlers(handlers));
 }
 
-export function addPost(path: string, handler: RequestHandler): void {
-  routeHandlers.set(`POST${path}`, handler);
+export function addPost(path: string, ...handlers: RequestHandler[]): void {
+  routeHandlers.set(`POST${path}`, getHandlers(handlers));
 }
 
-export function addPut(path: string, handler: RequestHandler): void {
-  routeHandlers.set(`PUT${path}`, handler);
+export function addPut(path: string, ...handlers: RequestHandler[]): void {
+  routeHandlers.set(`PUT${path}`, getHandlers(handlers));
 }
 
-export function addDelete(path: string, handler: RequestHandler): void {
-  routeHandlers.set(`DELETE${path}`, handler);
+export function addDelete(path: string, ...handlers: RequestHandler[]): void {
+  routeHandlers.set(`DELETE${path}`, getHandlers(handlers));
 }
 
 interface Query {
@@ -105,19 +122,22 @@ export const getRequestBody = async (
 
 interface HandlerWithParams {
   routeKey: string | unknown;
-  handlerWithParams: RequestHandler | undefined;
+  handlersWithParams: RequestHandler[] | undefined;
 }
 
-export const getHandlerWithParams = (
+export const getHandlersWithParams = (
   url: string,
+  method: string,
   urlParts: string[]
 ): HandlerWithParams => {
   const hasTrailingSlash = url.endsWith("/");
   const urlLength = urlParts.length - (hasTrailingSlash ? 1 : 0);
+  const urlRoot = `${method}/${urlParts[1]}`;
   const routes = Array.from(routeHandlers.keys());
   const routeKey = routes.find((route: string) => {
     const routeParts = route.split("/");
     return (
+      route.startsWith(urlRoot) &&
       routeParts.length === urlLength &&
       routeParts.every((routePart, index) => {
         const urlPart = urlParts[index];
@@ -127,8 +147,8 @@ export const getHandlerWithParams = (
       })
     );
   });
-  const handlerWithParams = routeHandlers.get(routeKey || "");
-  return { routeKey, handlerWithParams };
+  const handlersWithParams = routeHandlers.get(routeKey || "");
+  return { routeKey, handlersWithParams };
 };
 
 export const getParams = (

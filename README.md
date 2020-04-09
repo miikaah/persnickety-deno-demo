@@ -1,6 +1,6 @@
 TODO
 
-- Add middleware handling
+- Add error handling
 - Add beforeAll middleware
 - Add afterAll middleware
 

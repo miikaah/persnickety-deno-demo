@@ -8,8 +8,10 @@ export default function initFooPut(): void {
     const id = req.pathParams.id;
     const payload = req.payload;
     const foo = await getFoo(id);
+
     await addFoo(payload);
-    return req.respond({
+
+    req.respond({
       status: !foo ? 201 : 200,
       body: JSON.stringify(payload),
     });

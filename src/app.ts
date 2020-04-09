@@ -3,9 +3,7 @@ import { serve } from "https://deno.land/std/http/server.ts";
 // @ts-ignore
 import initRoutes from "./routes/init.ts";
 // @ts-ignore
-import getRouteHandler from "./router.ts";
-// @ts-ignore
-import { Request } from "./router.util.ts";
+import getRouteHandler, { RouterRequest } from "./router.ts";
 
 initRoutes();
 
@@ -15,10 +13,14 @@ console.log(`Serving http://localhost:${PORT}/`);
 
 // @ts-ignore
 for await (const req of server) {
-  const handler = await getRouteHandler(req);
-  if (!handler) {
-    req.respond({ status: 404, body: "Not Found" });
-    continue;
-  }
-  handler(req as Request);
+  getRouteHandler(req).then(async (router: RouterRequest) => {
+    const { handlers, request } = router;
+    if (!handlers) {
+      request.respondNotFound();
+      return;
+    }
+    for (const handler of handlers) {
+      await handler(request);
+    }
+  });
 }
