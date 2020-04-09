@@ -17,4 +17,10 @@ export default function initFooGet(): void {
 
     return req.respond({ status: 200, body: JSON.stringify(foo) });
   });
+  addGet("/foo/foo", async function getFooByFoo(req: Request): Promise<void> {
+    return req.respond({
+      status: 200,
+      body: JSON.stringify(await getFoo("a")),
+    });
+  });
 }
